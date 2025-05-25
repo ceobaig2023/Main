@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>App Drawer Web</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+    }
+
+    header {
+      background: #007BFF;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .app-list {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+    }
+
+    .app-card {
+      display: flex;
+      align-items: center;
+      background: white;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .app-card:hover {
+      background: #f0f0f0;
+    }
+
+    .app-icon {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      margin-right: 15px;
+      border-radius: 5px;
+    }
+
+    .app-details {
+      flex: 1;
+    }
+
+    .app-name {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .app-url {
+      color: #555;
+      font-size: 14px;
+    }
+
+    button {
+      background: white;
+      color: #007BFF;
+      border: 1px solid #007BFF;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #007BFF;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>📱 App Drawer Web</div>
+  <button onclick="syncData()">🔄 Refresh</button>
+</header>
+
+<div class="app-list" id="appList">
+  <p>Loading...</p>
+</div>
+
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycbwKdaNzYb0-XsU64repIn7kq2oJJBo_OWYrO7HQltRmuBiqXm3KWWvzjMlJun43Sknt/exec';
+  const appListEl = document.getElementById('appList');
+  const defaultIcon = 'https://via.placeholder.com/40?text=App';
+
+  async function fetchData() {
+    try {
+      const res = await fetch(API_URL);
+      const json = await res.json();
+
+      if (json.status === 'success') {
+        localStorage.setItem('apps', JSON.stringify(json.data));
+        renderApps(json.data);
+      } else {
+        throw new Error('API Error');
+      }
+    } catch (error) {
+      console.warn('Network failed, loading from localStorage...');
+      const cached = localStorage.getItem('apps');
+      if (cached) {
+        renderApps(JSON.parse(cached));
+      } else {
+        appListEl.innerHTML = '<p style="color:red">Failed to load apps</p>';
+      }
+    }
+  }
+
+  function renderApps(apps) {
+    appListEl.innerHTML = '';
+    apps.forEach(app => {
+      const card = document.createElement('div');
+      card.className = 'app-card';
+      card.onclick = () => {
+        window.open('https://' + app.appURL, '_blank');
+      };
+
+      card.innerHTML = `
+        <img src="${app.icon}" class="app-icon" onerror="this.src='${defaultIcon}'">
+        <div class="app-details">
+          <div class="app-name">${app.appName}</div>
+          <div class="app-url">${app.appURL}</div>
+        </div>
+      `;
+
+      appListEl.appendChild(card);
+    });
+  }
+
+  function syncData() {
+    appListEl.innerHTML = '<p>Refreshing...</p>';
+    fetchData();
+  }
+
+  // Initial load
+  fetchData();
+</script>
+
+</body>
+</html>
