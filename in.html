@@ -107,7 +107,7 @@
   //const role1 = (localStorage.getItem('role1') || '').trim(); // e.g., "Assistant"
   const role1 = (localStorage.getItem('role1') || '').replace(/^"+|"+$/g, '').trim();
 
-  document.getElementById("userName").innerText = role1 || 'Guest';
+  document.getElementById("userName").innerText = name1 || 'Guest';
 
   async function fetchData() {
     try {
