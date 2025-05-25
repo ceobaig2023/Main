@@ -107,10 +107,13 @@
   const appListEl = document.getElementById('appList');
   const defaultIcon = 'https://static-00.iconduck.com/assets.00/profile-default-icon-2048x2045-u3j7s5nj.png';
 
+  const name1 = (localStorage.getItem('name1') || '').replace(/^"+|"+$/g, '').trim();
   const role1 = (localStorage.getItem('role1') || '').replace(/^"+|"+$/g, '').trim();
   document.getElementById("userName").innerText = name1 || 'Guest';
 
   async function fetchData() {
+    console.log('fetchData() called');
+
     try {
       const res = await fetch(API_URL);
       const json = await res.json();
@@ -181,8 +184,8 @@
     window.location.href = "index.html";
   });
 
-  // Trigger data fetch on page load
-  window.onload = fetchData;
+  // ✅ Trigger data fetch immediately when DOM is loaded
+  document.addEventListener("DOMContentLoaded", fetchData);
 </script>
 
 </body>
